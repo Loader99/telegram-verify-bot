@@ -18,7 +18,7 @@ bot.onText(/\/start/, (msg) => {
 👋 Welcome!
 
 ✅ Step 1: Join our channel
-➡️ https://t.me/+KlO8aFTp9GkyNGQ1
+➡️ https://t.me/Alonetunnle
 
 ✅ Step 2: Click Verify after joining
 `;
