@@ -44,7 +44,7 @@ bot.on("callback_query", async (query) => {
 
   try {
     const member = await bot.getChatMember(
-      "@AloneOpTunnel", // channel username
+      "@Alonetunnle", // channel username
       userId
     );
 
