@@ -1,23 +1,24 @@
 const TelegramBot = require("node-telegram-bot-api");
 
-// 🔑 BOT TOKEN
+// 🔑 BOT TOKEN (Render / Heroku env me set karo)
 const TOKEN = process.env.BOT_TOKEN;
 
 if (!TOKEN) {
-  console.error("BOT_TOKEN missing");
+  console.error("❌ BOT_TOKEN missing");
   process.exit(1);
 }
 
+// Bot start
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// /start command
+// 🔹 /start command
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
 
   const text = `
 👋 Welcome!
 
-✅ Step 1: Join our channel
+✅ Step 1: Join our channel Firts
 ➡️ https://t.me/Alonetunnle
 
 ✅ Step 2: Click Verify after joining
@@ -29,22 +30,22 @@ bot.onText(/\/start/, (msg) => {
         [
           {
             text: "✅ Verify",
-            callback_data: "verify"
-          }
-        ]
-      ]
-    }
+            callback_data: "verify",
+          },
+        ],
+      ],
+    },
   });
 });
 
-// Verify button
+// 🔹 Verify button
 bot.on("callback_query", async (query) => {
   const chatId = query.message.chat.id;
   const userId = query.from.id;
 
   try {
     const member = await bot.getChatMember(
-      "@Alonetunnle", // channel username
+      -1003804142567, // ✅ CHANNEL ID
       userId
     );
 
@@ -57,7 +58,9 @@ bot.on("callback_query", async (query) => {
     } else {
       bot.sendMessage(chatId, "❌ Pehle channel join karo.");
     }
-  } catch (e) {
+  } catch (err) {
     bot.sendMessage(chatId, "❌ Channel join nahi mila.");
   }
 });
+
+console.log("🤖 Bot is running...");
