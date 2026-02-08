@@ -1,59 +1,68 @@
 const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
 
-// 🔑 BOT TOKEN (Koyeb / Render env me set hoga)
 const TOKEN = process.env.BOT_TOKEN;
-
 if (!TOKEN) {
-  console.error("❌ BOT_TOKEN missing");
+  console.error("BOT_TOKEN missing");
   process.exit(1);
 }
 
 const bot = new TelegramBot(TOKEN, { polling: true });
+const app = express();
 
-// 🔒 PRIVATE CHANNEL DETAILS
-const CHANNEL_ID = -1003137746166; // ← tumhara private channel ID
-const INVITE_LINK = "https://t.me/+KlO8aFTp9GkyNGQ1"; // private invite link
+app.use(express.json());
 
+// 🔒 PRIVATE CHANNEL ID
+const CHANNEL_ID = -1003137746166;
+
+// =======================
 // /start command
+// =======================
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
 
-  const text = `👋 Welcome!
+  const text =
+`👋 Welcome!
 
-🔒 Step 1: Join our PRIVATE channel
-👉 ${INVITE_LINK}
+Step 1️⃣ Join our private Telegram channel
+👉 https://t.me/+KlO8aFTp9GkyNGQ1
 
-✅ Step 2: Join karne ke baad Verify dabao`;
+Step 2️⃣ Come back & click Verify inside the app`;
 
-  bot.sendMessage(chatId, text, {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "✅ Verify", callback_data: "verify" }]
-      ]
-    }
-  });
+  bot.sendMessage(chatId, text);
 });
 
-// Verify button
-bot.on("callback_query", async (query) => {
-  const chatId = query.message.chat.id;
-  const userId = query.from.id;
+// =======================
+// VERIFY API (REAL)
+// =======================
+app.post("/verify", async (req, res) => {
+  const { telegram_id } = req.body;
+
+  if (!telegram_id) {
+    return res.status(400).json({ verified: false });
+  }
 
   try {
-    const member = await bot.getChatMember(CHANNEL_ID, userId);
+    const member = await bot.getChatMember(CHANNEL_ID, telegram_id);
 
     if (
       member.status === "member" ||
       member.status === "administrator" ||
       member.status === "creator"
     ) {
-      bot.sendMessage(chatId, "🎉 Verified! Access granted ✅");
+      return res.json({ verified: true });
     } else {
-      bot.sendMessage(chatId, "❌ Pehle channel join karo.");
+      return res.json({ verified: false });
     }
-  } catch (err) {
-    bot.sendMessage(chatId, "❌ Channel join nahi mila.");
+  } catch (e) {
+    return res.json({ verified: false });
   }
 });
 
-console.log("🤖 Bot started successfully");
+// =======================
+// SERVER START
+// =======================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("✅ Verify server running on port", PORT);
+});
