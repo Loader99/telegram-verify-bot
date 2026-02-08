@@ -1,66 +1,53 @@
 const TelegramBot = require("node-telegram-bot-api");
 
-// 🔑 BOT TOKEN (Render / Heroku env me set karo)
+// Bot token (Koyeb / Render env me set hona chahiye)
 const TOKEN = process.env.BOT_TOKEN;
 
-if (!TOKEN) {
-  console.error("❌ BOT_TOKEN missing");
-  process.exit(1);
-}
+// 🔒 PRIVATE CHANNEL DETAILS
+const CHANNEL_ID = -1003137746166;
+const INVITE_LINK = "https://t.me/+KlO8aFTp9GkyNGQ1";
 
-// Bot start
 const bot = new TelegramBot(TOKEN, { polling: true });
 
-// 🔹 /start command
+// /start command
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
 
-  const text = `
-👋 Welcome!
+  bot.sendMessage(
+    chatId,
+    `👋 Welcome!
 
-✅ Step 1: Join our channel Firts
-➡️ https://t.me/Alonetunnle
+🔒 Step 1: Join our PRIVATE channel
+👉 ${https://t.me/+KlO8aFTp9GkyNGQ1}
 
-✅ Step 2: Click Verify after joining
-`;
-
-  bot.sendMessage(chatId, text, {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: "✅ Verify",
-            callback_data: "verify",
-          },
-        ],
-      ],
-    },
-  });
+✅ Step 2: Join karne ke baad Verify dabao`,
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "✅ Verify", callback_data: "verify" }]
+        ]
+      }
+    }
+  );
 });
 
-// 🔹 Verify button
+// Verify button logic
 bot.on("callback_query", async (query) => {
-  const chatId = query.message.chat.id;
   const userId = query.from.id;
 
   try {
-    const member = await bot.getChatMember(
-      -1003804142567, // ✅ CHANNEL ID
-      userId
-    );
+    const member = await bot.getChatMember(CHANNEL_ID, userId);
 
     if (
       member.status === "member" ||
       member.status === "administrator" ||
       member.status === "creator"
     ) {
-      bot.sendMessage(chatId, "🎉 Verified! Access granted ✅");
+      bot.sendMessage(userId, "🎉 Verified! Access granted 🔓");
     } else {
-      bot.sendMessage(chatId, "❌ Pehle channel join karo.");
+      bot.sendMessage(userId, "❌ Pehle private channel join karo");
     }
   } catch (err) {
-    bot.sendMessage(chatId, "❌ Channel join nahi mila.");
+    bot.sendMessage(userId, "❌ Channel join detect nahi hua");
   }
 });
-
-console.log("🤖 Bot is running...");
